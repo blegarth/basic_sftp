@@ -1,0 +1,26 @@
+==========
+Basic SFTP
+==========
+
+
+
+
+
+
+This projects creates a basic sftp connection that allows you to send any document to a digital 
+ocean server that I have set up.
+
+
+
+Features
+--------
+
+* TODO
+
+Credits
+-------
+
+This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
+
+.. _Cookiecutter: https://github.com/audreyr/cookiecutter
+.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
