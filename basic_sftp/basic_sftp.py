@@ -8,36 +8,72 @@ logging.basicConfig(level=logging.INFO)
 remotepath = '/home/brian/files/'
 
 
-def basic_sftp(fname, direct):
-    '''This method creates a connection to the host server and puts a file
-    in that location and gets back the succcess file'''
-    try:
-        startTime = time.perf_counter()
-        s = pysftp.Connection(
-            '64.227.11.42', username='guest', password='password')
+class BasicSftp():
+    def __init__(self, remotepath, ip, username, password, port):
+        self.sftpConnect = None
+        self.remotePath = remotepath
+        self.ip = ip
+        self.username = username
+        self.password = password
+        self.port = port
 
-        if direct:
-            # This allows you to move the entire contents of a folder to your remote
-            # server rather than just one file
-            fileNum = len([f for f in os.listdir(fname)
-                           if os.path.isfile(os.path.join(fname, f))])
-            foldername = fname.split('/')[-2]
-            newfolder = remotepath + foldername
-            # Creates a new folder, places the items in the folder, gives privileges to the admin
-            s.mkdir(newfolder)
-            s.put_r(fname, newfolder)
-            s.chmod(newfolder, mode=777)
-        else:
-            # This will just move one specific file to the remote server
-            fileNum = 1
-            filename = fname.split('/')[-1]
-            s.put(fname, remotepath + filename)
+    # Took out the ssh key put back in when testing later
+    def sftp(self):
+        '''This method creates a sftp connection to a remote server allowing you
+        to transfer files later'''
+        try:
+            # Removed the ssh key put back in after testing this first part
+            self.sftpConnect = pysftp.Connection(
+                self.ip, username=self.username, password=self.password, port=self.port)
 
-        endTime = time.perf_counter() - startTime
-        logging.info('A total of %d file(s) were added in %2.4f seconds.' %
-                     (fileNum, endTime))
-        return s.exists(remotepath)
+            return self.sftpConnect.exists(self.remotePath)
 
-    except Exception as e:
-        logging.error(str(e))
-        return(False)
+        except Exception as e:
+            logging.error(e)
+            return(False)
+
+    def transferContents(self, fname, direct):
+        '''This method transfers the contents of a local folder to the remote
+        server'''
+        try:
+            startTime = time.perf_counter()
+            if direct:
+                # This allows you to move the entire contents of a folder to your remote
+                # server rather than just one file
+                fileNum = len([f for f in os.listdir(fname)
+                               if os.path.isfile(os.path.join(fname, f))])
+                foldername = fname.split('/')[-2]
+                newfolder = self.remotePath + foldername
+                # Creates a new folder, places the items in the folder, gives privileges to the admin
+                self.sftpConnect.mkdir(newfolder)
+                self.sftpConnect.put_r(fname, newfolder)
+                self.sftpConnect.chmod(newfolder, mode=777)
+            else:
+                # This will just move one specific file to the remote server
+                fileNum = 1
+                filename = fname.split('/')[-1]
+                self.sftpConnect.put(fname, self.remotePath + filename)
+            endTime = time.perf_counter() - startTime
+            logging.info('A total of %d file(s) were added in %2.4f seconds.' %
+                         (fileNum, endTime))
+            return self.sftpConnect.exists(self.remotePath)
+
+        except Exception as e:
+            logging.error(str(e))
+            return False
+
+    def check_open(self):
+        '''Checks to see if the connection is open and returns the object'''
+        return str(self.sftpConnect)
+
+    def close(self):
+        '''Closes the connection if there is one'''
+        if self.sftpConnect:
+            self.sftpConnect.close()
+
+    def getip(self):
+        '''Returns the IP address'''
+        return self.ip
+
+    def __str__(self):
+        return('%s /n %s /n %s /n %s /n %d' % (self.remotePath, self.ip, self.username, self.password, self.port))
