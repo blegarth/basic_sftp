@@ -9,22 +9,25 @@ remotepath = '/home/brian/files/'
 
 
 class BasicSftp():
-    def __init__(self, remotepath, ip, username, password, port):
+    def __init__(self, remotepath, ip, username, password, ssh_key, port):
         self.sftpConnect = None
         self.remotePath = remotepath
         self.ip = ip
         self.username = username
         self.password = password
+        self.ssh_key = ssh_key
         self.port = port
 
-    # Took out the ssh key put back in when testing later
     def sftp(self):
         '''This method creates a sftp connection to a remote server allowing you
         to transfer files later'''
         try:
-            # Removed the ssh key put back in after testing this first part
-            self.sftpConnect = pysftp.Connection(
-                self.ip, username=self.username, password=self.password, port=self.port)
+            if self.ssh_key:
+                self.sftpConnect = pysftp.Connection(
+                    self.ip, username=self.username, password=self.password, private_key=self.ssh_key, port=self.port)
+            else:
+                self.sftpConnect = pysftp.Connection(
+                    self.ip, username=self.username, password=self.password, port=self.port)
 
             return self.sftpConnect.exists(self.remotePath)
 

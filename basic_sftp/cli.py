@@ -9,19 +9,28 @@ from basic_sftp import basic_sftp
 @click.command()
 @click.argument('remotepath', metavar='remotepath')
 @click.argument('ip', metavar='ip')
-def main(remotepath, ip):
+@click.option('--ssh', metavar='ssh', is_flag=True)
+def main(remotepath, ip, ssh):
     '''This instansiates the BasicSftp object to be able to transfer files in the future'''
     username = click.prompt('Username ', type=str, default='guest')
     password = click.prompt('Password ', hide_input=True, default='password')
+
+    # If the user designated that he wanted to include the ssh key then it will be prompted
+    if ssh:
+        ssh_key = click.prompt('SSH Key ', hide_input=True)
+    else:
+        ssh_key = None
+
     port = click.prompt('Port ', type=int, default=22)
 
-    logging.info('remotepath %s ip %s username %s password %s port %s' %
-                 (remotepath, ip, username, password, port))
-    bsftp = basic_sftp.BasicSftp(remotepath, ip, username, password, port)
+    logging.debug('remotepath %s ip %s username %s password %s port %s' %
+                  (remotepath, ip, username, password, port))
+    bsftp = basic_sftp.BasicSftp(
+        remotepath, ip, username, password, ssh_key, port)
 
     if bsftp:
         logging.info('Connecting to remote server @%s . . .' % (bsftp.getip()))
-        bsftp.sftp()  # add ssh_key in later
+        bsftp.sftp()
         logging.info('Connected to remote server @%s' % (bsftp.getip()))
 
         fname = click.prompt('Filename/folder name you would like to transfer')
