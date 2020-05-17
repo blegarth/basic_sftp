@@ -12,7 +12,7 @@ History
 ------------------
 
 * This package is now able to be pip installed. I am still working out how to use the SSH_KEY in the SFTP connection because
-I am still new to those.
+* I am still new to those.
 
 
 1.1.0 (2020-05-12)
