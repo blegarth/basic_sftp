@@ -3,6 +3,11 @@ History
 =======
 
 
+1.3.4 (2020-05-17)
+------------------
+
+* Updated the ssh_key prompt to not hide the input so you can see what file location you are using
+
 1.3.3 (2020-05-16)
 ------------------
 

@@ -17,7 +17,7 @@ def main(remotepath, ip, ssh):
 
     # If the user designated that he wanted to include the ssh key then it will be prompted
     if ssh:
-        ssh_key = click.prompt('SSH Key ', hide_input=True)
+        ssh_key = click.prompt('SSH Key file location ')
     else:
         ssh_key = None
 

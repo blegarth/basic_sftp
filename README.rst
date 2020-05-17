@@ -13,7 +13,7 @@ credentials.
 Features
 --------
 
-* Add in SSH_KEY functionality rather than just username and password functionality
+* SFTP file transfer
 
 Credits
 -------
