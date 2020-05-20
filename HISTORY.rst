@@ -2,11 +2,15 @@
 History
 =======
 
+1.3.7 (2020-05-20)
+------------------
+
+* Added the functionality to transfer json objects or pdf streams to the remote server
+
 1.3.6 (2020-05-20)
 ------------------
 
 * Added the functionality to download a pdf from the internet and convert it to binary and send it as a json file
-
 
 1.3.4 (2020-05-17)
 ------------------
