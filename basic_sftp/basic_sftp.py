@@ -58,7 +58,7 @@ class BasicSftp():
                 self.sftpConnect.put(fname, self.remotePath + filename)
             # endTime = time.perf_counter() - startTime
             logging.info('A total of %d file(s) were added in %2.4f seconds.' %
-                         (fileNum, endTime))
+                         (fileNum, 1))
             return self.sftpConnect.exists(self.remotePath)
 
         except Exception as e:
