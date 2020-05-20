@@ -39,7 +39,7 @@ class BasicSftp():
         '''This method transfers the contents of a local folder to the remote
         server'''
         try:
-            startTime = time.perf_counter()
+            # startTime = time.perf_counter()
             if direct:
                 # This allows you to move the entire contents of a folder to your remote
                 # server rather than just one file
@@ -56,7 +56,7 @@ class BasicSftp():
                 fileNum = 1
                 filename = fname.split('/')[-1]
                 self.sftpConnect.put(fname, self.remotePath + filename)
-            endTime = time.perf_counter() - startTime
+            # endTime = time.perf_counter() - startTime
             logging.info('A total of %d file(s) were added in %2.4f seconds.' %
                          (fileNum, endTime))
             return self.sftpConnect.exists(self.remotePath)
@@ -80,3 +80,10 @@ class BasicSftp():
 
     def __str__(self):
         return('%s /n %s /n %s /n %s /n %d' % (self.remotePath, self.ip, self.username, self.password, self.port))
+
+######### OTher changes that need to be done to the program ###############
+# * Have a set method for the sftp connect that allows you to change the settings of the current connection
+# * Make it so that the ssh key is required for the click method
+# * Fix the sftp method so that you can create a new connection if one already exists
+#   or just set all of the variables and start one if none exists
+# *
