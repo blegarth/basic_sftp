@@ -22,6 +22,23 @@ class BasicSftp():
         self.ssh_key = ssh_key
         self.port = port
 
+    def setVariables(self, remotepath=None, ip=None, username=None, password=None, ssh_key=None, port=None):
+        '''Sets the variables if you want to change them after instansiating a BasicSftp'''
+        if self.sftpConnect:
+            self.close()
+        if remotepath:
+            self.remotePath = remotepath
+        if ip:
+            self.ip = ip
+        if username:
+            self.username = username
+        if password:
+            self.password = password
+        if ssh_key:
+            self.ssh_key = ssh_key
+        if port:
+            self.port = port
+
     def sftp(self):
         '''This method creates a sftp connection to a remote server allowing you
         to transfer files later'''
@@ -69,57 +86,47 @@ class BasicSftp():
             logging.error(str(e))
             return False
 
-    def transferPDF(self, fname):
-        '''This method downloads a pdf, opens the file, saves the buffer info, and
-        transfers the contents to a server (printer in the future)'''
-        # ****** TO DO figure out what is supposed to go in and out
-        # and if they are downloading the pdf from a url or a file
-        # then figure out the format of the json so that I can better
-        # write that part
-
+    def transfer_json(self, jsonObj):
+        '''This method transfers the JSON object that is being passed
+        to the server'''
         # Makes sure there is a connection
         if self.sftpConnect is None:
             self.sftp()
 
-        # Encodes the pdf
-        encoded_pdf = self.get_pdf_data_from_file(fname)
-        data = {}
-        data['encoded_pdf'] = encoded_pdf
-        logging.info('The pdf has been encoded.')
-
+        tempfile = 'data.json'
         # Dumps the json data to a file that can be transferred to the remote server
-        with open('data.json', 'w') as outfile:
-            json.dump(data, outfile)
+        with open(tempfile, 'w') as outfile:
+            json.dump(jsonObj, outfile)
         logging.info('The encoded pdf has been put into a json file.')
 
         # Transfers the json file to the remote server
-        self.sftpConnect.put('data.json', self.remotePath + 'data.json')
+        self.sftpConnect.put(tempfile, self.remotePath + 'data.json')
         logging.info('The JSON file has been moved to the remote server.')
 
-        # Transfers the pdf to the remote server
-        filename = fname.split('/')[-1]
-        self.sftpConnect.put(fname, self.remotePath + filename)
-        logging.info('The pdf file has been moved to the remote server.')
+        os.remove(tempfile)
 
         return self.sftpConnect.exists(self.remotePath)
 
-    def encode(self, data):
-        '''Returns a base64 encode value of binary data'''
-        return base64.b64encode(data)
+    def transfer_pdf_stream(self, bites):
+        '''This method takes in an opened PDF stream then converts it to a pdf
+        and save it to the remote server'''
+        # Makes sure there is a connection
+        if self.sftpConnect is None:
+            self.sftp()
 
-    def decode(self, data):
-        '''Returns the decoded value of a base-64 encoded string'''
-        return base64.b64decode(data.encode())
+        tempfile = 'data.pdf'
+        # Writes the pdfstream data to the outfile
+        with open(tempfile, 'wb') as outfile:
+            outfile.write(bites.read())
+        logging.info('The pdf stream has been converted to a pdf')
 
-    def get_pdf_data_from_file(self, filename):
-        ''' Open a pdf file in binary mode and returns a string encoded in base-64'''
-        with open(filename, 'rb') as myFile:
-            return self.encode(myFile.read())
+        # Transfers the pdf file to the remote server
+        self.sftpConnect.put(tempfile, self.remotePath + 'data.pdf')
+        logging.info('The PDF file has been moved to the remote server.')
 
-    def get_pdf_data_from_url(self, url):
-        '''Downloads and opens a pdf in binary mode and returns a string encoded in base-64'''
-        myfile = requests.get(url)
-        return self.encode(myfile.content)
+        os.remove(tempfile)
+
+        return self.sftpConnect.exists(self.remotePath)
 
     def check_open(self):
         '''Checks to see if the connection is open and returns the object'''
